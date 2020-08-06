@@ -1,0 +1,84 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+usage() {
+    [[ $# -gt 0 ]] && echo "$1" >&2 && echo >&2
+    cat >&2 <<EOF
+Print only the fields specified as arguments (one-based)
+
+Usage: $0 [fields]
+supported options:
+    -F fs    specify field separator for awk
+    -h       display this help
+    -H       treat first line as a header
+    -O       specify output field separator
+
+Notes:
+Normally the fields are specified as one-based indices.
+If the header option is used, they are column names instead.
+
+Examples:
+echo "This is not a test" | fld 1 2 4 5
+echo "This|is|not|a|test" | fld -F "|" -O "+" 1 2 4 5
+
+EOF
+    [[ $# -gt 0 ]] && exit 1 || exit 0
+}
+
+[[ $# -gt 0 ]] || usage "Missing required args"
+
+# define defaults up front
+use_header=
+sep=
+osep_args=
+
+# process arguments
+while getopts ":F:hHO:" opt; do
+    case $opt in
+        F)  sep=$OPTARG;;
+        h)  usage;;
+        H)  use_header=use_header;;
+        O)  osep_args="-v OFS=$OPTARG";;
+        \?) usage "Invalid option: -$OPTARG";;
+        :)  usage "Option -$OPTARG requires an argument";;
+    esac
+done
+shift $(($OPTIND - 1))
+
+if [[ "${use_header}" == use_header ]]; then
+    read header
+    flds=
+    pgm='{for (i = 1; i <= NF; ++i) print($i)}'
+    if [[ -n "$sep" ]]; then
+        lines=$(echo "$header" | awk -F "$sep" "$pgm")
+    else
+        lines=$(echo "$header" | awk "$pgm")
+    fi
+    for word in $*; do
+        idx=1
+        while read line; do
+            if [[ "$word" == "$line" ]]; then
+                flds+=" $idx"
+            fi
+            idx=$((idx + 1))
+        done <<< "$lines"
+    done
+    set -- $flds
+fi
+
+first=1
+pgm="{print "
+for i in $*; do
+    [[ $first == 0 ]] && pgm=$pgm", "
+    pgm=$pgm"\$"$i
+    first=0
+done
+pgm=$pgm"}"
+
+if [[ -n "$sep" ]]; then
+    awk -F "$sep" ${osep_args} "$pgm"
+else
+    awk ${osep_args} "$pgm"
+fi
