@@ -29,7 +29,7 @@ def read_file(filename):
     return result
 
 def print_results(filename, results):
-    ps = jboss.java.io.PrintStream(jboss.xtp.util.OutputFile.of(filename).get_output_stream())
+    ps = jboss.java.io.PrintStream(jboss.boss.util.OutputFile.of(filename).get_output_stream())
     for line in results:
         ps.println(line)
     ps.close()
