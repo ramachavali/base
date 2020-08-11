@@ -29,14 +29,14 @@ def read_file(filename):
     return result
 
 def print_results(filename, results):
-    ps = jxtp.java.io.PrintStream(jxtp.xtp.util.OutputFile.of(filename).get_output_stream())
+    ps = jboss.java.io.PrintStream(jboss.xtp.util.OutputFile.of(filename).get_output_stream())
     for line in results:
         ps.println(line)
     ps.close()
 
 # TODO: make this whole thing a function instead of inline
 for pool, pcfg in pools.items():
-    pattern = "s3://bfc-archive/reports/in/ssc/{SLASHY_DATE}/%s_pos_eod_{COMPACT_DATE}.txt.gz" % (pcfg["tag"])
+    pattern = "%s_pos_eod_{COMPACT_DATE}.txt.gz" % (pcfg["tag"])
     filenames = gather_filenames(pcfg["calendar"], max(begin_date, pcfg["begin_date"]), end_date, pattern)
     cfg = xmd.Configuration()
     cfg.env["MUL"] = pcfg["to_usd_f"]
