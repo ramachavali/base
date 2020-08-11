@@ -1,0 +1,38 @@
+# update xtp folder with master updates
+git checkout master
+git pull
+
+# create a new branch for work
+git checkout <work branch>
+git pull
+
+# before starting work
+git branch <branch> << not master branch
+git branch --set-upstream-to=origin/master <branch>
+
+# after work is completed
+git status
+git diff --cached
+git add
+
+# before committing changes to <branch> 
+git status
+git diff --cached
+  # make sure every file has a new line at the end
+git commit
+git rebase -i
+   - :4sf for every line after the 1st (squash all commits to one)
+
+## if changes are minor (spelling, text), then upload out exisiting pull
+#request
+
+# before uploading
+git checkout master
+git pull
+git checkout <branch>
+git pull
+## close any pull requests that are for <branch>
+## delete <branch> from UI
+
+# upload branch with updated work. this will create a new <branch>
+git push ssh://git@ec2-3-93-137-240.compute-1.amazonaws.com/<repo>/<name>
