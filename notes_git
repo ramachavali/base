@@ -1,4 +1,4 @@
-# update xtp folder with master updates
+# update boss folder with master updates
 git checkout master
 git pull
 
@@ -36,3 +36,4 @@ git pull
 
 # upload branch with updated work. this will create a new <branch>
 git push ssh://git@ec2-3-93-137-240.compute-1.amazonaws.com/<repo>/<name>
+git push -u origin master
